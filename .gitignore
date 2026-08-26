@@ -5,7 +5,22 @@ __pycache__/
 .venv/
 venv/
 
+# Тесты и покрытие
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
 # Сборка .deb (артефакты)
 /dist/
 /debuild/
+/build/
 *.deb
+
+# Логи
+*.log
+
+# Редакторы и OC
+.idea/
+.vscode/
+.DS_Store
