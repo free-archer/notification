@@ -1,0 +1,14 @@
+[Unit]
+Description=Информатор рабочих встреч
+Documentation=file:///home/archer/projects/notification/docs/plans/2026-08-26-meeting-informer-design.md
+After=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=/home/archer/bin/meeting-informer
+Restart=on-failure
+RestartSec=3
+# Информатор работает только в локальной графической сессии. RDP не участвует.
+
+[Install]
+WantedBy=graphical-session.target

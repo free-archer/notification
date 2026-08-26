@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+#
+# CLI-валидатор для Pi-скилла: обновляет файл расписания.
+# Читает строки из stdin: по одной на событие, формат 'YYYY-MM-DD HH:MM | Название'.
+set -euo pipefail
+
+SELF="$(readlink -f "${BASH_SOURCE[0]}")"
+PROJECT_DIR="$(cd "$(dirname "${SELF}")/.." && pwd)"
+export PYTHONPATH="${PROJECT_DIR}${PYTHONPATH:+:$PYTHONPATH}"
+exec python3 -m meeting_informer.updater "$@"

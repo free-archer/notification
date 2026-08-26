@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+#
+# Лаунчер информатора встреч.
+#
+# Запускается пользовательским systemd-сервисом. systemd --user обычно не
+# передаёт переменные графической сессии (WAYLAND_DISPLAY, DISPLAY,
+# DBUS_SESSION_BUS_ADDRESS, XDG_RUNTIME_DIR). Здесь мы подхватываем их из
+# окружения живущего процесса GNOME, затем стартуем Python-приложение,
+# которому нужны GTK и PipeWire.
+set -euo pipefail
+
+# Разрешаем реальный путь (лаунчер может быть симлинком из ~/bin).
+SELF="$(readlink -f "${BASH_SOURCE[0]}")"
+PROJECT_DIR="$(cd "$(dirname "${SELF}")/.." && pwd)"
+
+# Найти PID процесса графической сессии, чтобы взять окружение.
+SESSION_PID=""
+for probe in gnome-shell gnome-session-binary evolution-calendar; do
+    pid="$(pgrep -u "$USER" -f "$probe" 2>/dev/null | head -n1 || true)"
+    if [ -n "${pid}" ]; then
+        SESSION_PID="${pid}"
+        break
+    fi
+done
+
+# Если переменных сессии ещё нет — извлечь их из /proc/<pid>/environ.
+if [ -z "${WAYLAND_DISPLAY:-}" ] && [ -z "${DISPLAY:-}" ] && [ -n "${SESSION_PID}" ] \
+   && [ -r "/proc/${SESSION_PID}/environ" ]; then
+    while IFS= read -r -d '' entry; do
+        case "${entry}" in
+            WAYLAND_DISPLAY=*|DISPLAY=*|DBUS_SESSION_BUS_ADDRESS=*|XDG_RUNTIME_DIR=*|XAUTHORITY=*)
+                export "${entry}"
+                ;;
+        esac
+    done < "/proc/${SESSION_PID}/environ"
+fi
+
+# Защита: не стартуем без графического окружения (например, чистый SSH-сеанс).
+if [ -z "${WAYLAND_DISPLAY:-}" ] && [ -z "${DISPLAY:-}" ]; then
+    echo "meeting-informer: нет графической сессии (WAYLAND_DISPLAY/DISPLAY не заданы), выходим." >&2
+    exit 0
+fi
+
+export PYTHONPATH="${PROJECT_DIR}${PYTHONPATH:+:$PYTHONPATH}"
+exec python3 -m meeting_informer "$@"
