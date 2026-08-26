@@ -1,0 +1,6 @@
+#!/usr/bin/make -f
+# Стандартный файл правил debhelper. Для сборки без debhelper используйте
+# ./build-deb.sh (самодостаточная сборка через dpkg-deb).
+
+%:
+	dh $@

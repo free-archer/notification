@@ -118,6 +118,33 @@ systemctl --user disable meeting-informer.service
 python3 -m unittest discover -s tests
 ```
 
+## Сборка .deb пакета
+
+Проект готов к упаковке в Debian-пакет. Сборка самодостаточная (не требует `debhelper`), через `dpkg-deb`:
+
+```bash
+./build-deb.sh
+```
+
+Результат: `dist/meeting-informer_<version>_all.deb`.
+
+Установить:
+
+```bash
+sudo apt install ./dist/meeting-informer_*.deb
+```
+
+Пакет устанавливает:
+
+- приложение в `/usr/lib/meeting-informer/`;
+- лаунчеры `/usr/bin/meeting-informer` и `/usr/bin/meeting-informer-update`;
+- пользовательскую службу `/usr/lib/systemd/user/meeting-informer.service`;
+- документацию и Pi-скилл в `/usr/share/meeting-informer/`.
+
+`postinst` создаёт шаблон `events.txt` в домашнем каталоге, копирует Pi-скилл в `~/.agents/skills/` и пытается включить и запустить пользовательскую службу для текущего пользователя (`SUDO_USER`). Именно поэтому чтение расписания остаётся по-прежнему `~/.local/share/meeting-informer/events.txt`.
+
+Метаданные пакета находятся в каталоге `debian/` (`control`, `changelog`, `copyright`, `rules`, `compat`). Для сборки по стандартной схеме через `dpkg-buildpackage` понадобится `debhelper`; текущий `build-deb.sh` работает без него.
+
 ---
 
 ## Ограничения

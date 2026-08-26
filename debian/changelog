@@ -1,0 +1,7 @@
+meeting-informer (0.1.0-1) unstable; urgency=medium
+
+  * Первый релиз: GTK-информатор встреч с обязательными окнами,
+    повторяемым звуком, автозапуском через systemd --user и Pi-скиллом
+    для импорта встреч из скриншота Яндекс Календаря.
+
+ -- Alexey Bespalov <bespalov.alexey@uandex.ru>  Wed, 26 Aug 2026 15:00:00 +0700
