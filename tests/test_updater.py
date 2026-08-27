@@ -53,6 +53,33 @@ class UpdateTest(unittest.TestCase):
         with open(self.path, encoding="utf-8") as f:
             self.assertEqual(f.read(), before)
 
+    def test_replace_clears_and_refills(self):
+        update(["2026-08-26 14:30 | A", "2026-08-27 09:00 | B"], self.path)
+        report = update(["2026-08-28 10:00 | C"], self.path, replace=True)
+        self.assertIn("Файл очищен и заполнен заново.", report)
+        self.assertIn("Добавлено: 1", report)
+        with open(self.path, encoding="utf-8") as f:
+            content = f.read()
+        self.assertIn("2026-08-28 10:00 | C", content)
+        self.assertNotIn("14:30 | A", content)
+        self.assertNotIn("09:00 | B", content)
+
+    def test_replace_preserves_header_comment(self):
+        update(["# Шапка расписания", "2026-08-26 14:30 | A"], self.path)
+        report = update(["2026-08-28 10:00 | C"], self.path, replace=True)
+        with open(self.path, encoding="utf-8") as f:
+            content = f.read()
+        self.assertIn("# Шапка расписания", content)
+        self.assertIn("2026-08-28 10:00 | C", content)
+        self.assertNotIn("14:30 | A", content)
+
+    def test_replace_rewrites_even_when_empty_new_set(self):
+        update(["2026-08-26 14:30 | A"], self.path)
+        report = update([], self.path, replace=True)
+        with open(self.path, encoding="utf-8") as f:
+            content = f.read()
+        self.assertNotIn("14:30 | A", content)
+
 
 class AtomicWriteTest(unittest.TestCase):
     def test_replaces_content(self):
