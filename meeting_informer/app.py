@@ -18,6 +18,15 @@ from .sound import SoundPlayer
 TICK_SEC = 1.0
 LOG = logging.getLogger("meeting_informer")
 
+# Цвета подписи этапа напоминания по коду стадии.
+# 15 минут — зелёный, 5 минут — синий, 1 минута — красный, начало — красный жирный.
+STAGE_STYLE = {
+    "-15m": "#2e7d32",
+    "-5m": "#1565c0",
+    "-1m": "#c62828",
+    "start": "#c62828",
+}
+
 
 class ReminderWindow(Gtk.Window):
     """Обязательное окно напоминания. Остаётся поверх остальных окон,
@@ -45,8 +54,16 @@ class ReminderWindow(Gtk.Window):
         self.add(box)
 
         stage_label = Gtk.Label()
-        stage_label.set_markup(f"<b>{reminder.label}</b>")
         stage_label.set_halign(Gtk.Align.START)
+        color = STAGE_STYLE.get(reminder.stage, "#000000")
+        if reminder.stage == "start":
+            stage_label.set_markup(
+                f"<b><span foreground='{color}'>{reminder.label}</span></b>"
+            )
+        else:
+            stage_label.set_markup(
+                f"<span foreground='{color}'>{reminder.label}</span>"
+            )
         box.pack_start(stage_label, False, False, 0)
 
         time_label = Gtk.Label()

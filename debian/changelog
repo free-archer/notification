@@ -1,3 +1,11 @@
+meeting-informer (0.1.1-1) unstable; urgency=medium
+
+  * Цветовая индикация этапа напоминания в окне: за 15 минут — зелёный,
+    за 5 минут — синий, за 1 минуту — красный, начало встречи — красный
+    жирный.
+
+ -- Alexey Bespalov <bespalov.alexey@uandex.ru>  Thu, 27 Aug 2026 19:47:49 +0700
+
 meeting-informer (0.1.0-1) unstable; urgency=medium
 
   * Первый релиз: GTK-информатор встреч с обязательными окнами,
